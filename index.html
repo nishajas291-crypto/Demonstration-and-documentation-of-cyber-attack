@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IBM — Cyber Attack Impact Demo & Documentation</title>
+  <link rel="stylesheet" href="style.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #0ea5a4;
+      --muted: #94a3b8;
+      --glass: rgba(255, 255, 255, 0.04)
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Poppins, system-ui, Segoe UI, Roboto, Arial
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #071029 0%, #071028 100%);
+      color: #e6eef6;
+      min-height: 100vh
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 20px
+    }
+
+    header {
+      display: flex;
+      gap: 16px;
+      align-items: center
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5a4, #0369a1);
+      display: grid;
+      place-items: center;
+      font-weight: 700
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px
+    }
+
+    p.lead {
+      color: var(--muted);
+      margin: 6px 0 18px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 18px
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+    }
+
+    /* Simulation panel */
+    .metrics {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .metric {
+      flex: 1;
+      background: var(--glass);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      color: #022;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600
+    }
+
+    button.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted)
+    }
+
+    select {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      padding: 8px;
+      border-radius: 8px
+    }
+
+    /* Documentation */
+    .doc h3 {
+      margin: 0 0 6px
+    }
+
+    .doc p {
+      color: var(--muted);
+      line-height: 1.45
+    }
+
+    ul {
+      padding-left: 18px
+    }
+
+    /* checklist */
+    .checklist li {
+      margin: 8px 0
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      margin-left: 8px
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    @media (max-width:900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 12px
+      }
+    }
+
+    /* Login overlay */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.95));
+      z-index: 9999;
+    }
+
+    .login-card {
+      width: 360px;
+      background: #071428;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.7);
+      text-align: center;
+    }
+
+    .login-card h2 {
+      margin: 0 0 8px;
+      font-size: 22px
+    }
+
+    .login-card p {
+      margin: 0 0 16px;
+      color: var(--muted)
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      text-align: left
+    }
+
+    .form-group label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: 6px
+    }
+
+    .form-group input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: inherit
+    }
+
+    .error {
+      color: #ffb4b4;
+      font-size: 13px;
+      margin-bottom: 8px;
+      min-height: 18px
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px
+    }
+
+    .hidden {
+      display: none
+    }
+  </style>
+</head>
+
+<body>
+  <!-- LOGIN SCREEN: appears first; hides demo until valid credentials -->
+  <div id="loginScreen" class="login-screen" aria-hidden="false">
+    <div class="login-card" role="dialog" aria-labelledby="loginTitle" aria-modal="true">
+      <h2 id="loginTitle">Cyber world</h2>
+      <p>Enter credentials to continue to the IBM Cyber Attack Impact demo.</p>
+
+      <div class="error" id="loginError"></div>
+
+      <div class="form-group">
+        <label for="username">Username (email)</label>
+        <input id="username" type="email" placeholder="you@example.com" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="password" autocomplete="current-password" />
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="loginBtn">Verify & Enter</button>
+        <button id="clearBtn" class="ghost" type="button">Clear</button>
+      </div>
+
+      <div class="small-note">Demo credentials (client-side): <strong>username:</strong> cybergirls916@gmail.com &nbsp;
+        <strong>password:</strong> cyber girls
+      </div>
+      <button id="logoutBtn"
+        style="position:fixed;top:16px;right:16px;padding:8px 12px;background:#ff4d4f;border:none;border-radius:6px;color:white;cursor:pointer;">Logout</button>
+
+    </div>
+  </div>
+
+  <!-- MAIN PAGE: hidden until authentication -->
+  <div id="mainApp" class="hidden">
+    <div class="container" id="appContainer">
+      <header>
+        <div class="logo">IBM</div>
+        <div>
+          <h1>IBM — Cyber Attack Impact: Demo & Documentation</h1>
+          <p class="lead">Summary: This single-page demo explains the potential impacts of cyber attacks on a large
+            enterprise (like IBM) and the key actions required to mitigate and recover.</p>
+        </div>
+      </header>
+
+      <main class="grid" style="margin-top:16px">
+        <!-- LEFT: Demo & Content -->
+        <section>
+          <div class="card">
+            <h2>Interactive Impact Simulator</h2>
+            <p class="lead">Click "Simulate attack" to see short-term impact over simulated time steps (systems
+              compromised, data exfiltrated, downtime, estimated cost).</p>
+
+            <div class="metrics" id="metrics">
+              <div class="metric">
+                <div>Systems Compromised</div>
+                <strong id="compromised">0</strong>
+              </div>
+              <div class="metric">
+                <div>Data Exfiltrated (GB)</div>
+                <strong id="exfil">0</strong>
+              </div>
+              <div class="metric">
+                <div>Operational Downtime (hrs)</div>
+                <strong id="downtime">0</strong>
+              </div>
+              <div class="metric">
+                <div>Estimated Cost (USD)</div>
+                <strong id="cost">$0</strong>
+              </div>
+            </div>
+
+            <div class="controls">
+              <button id="startSim">Simulate attack</button>
+              <button id="resetSim" class="ghost">Reset</button>
+              <select id="attackType" aria-label="attack type">
+                <option value="ransomware">Ransomware</option>
+                <option value="supply">Supply-chain compromise</option>
+                <option value="insider">Malicious insider</option>
+                <option value="phishing">Spear-phishing leading to breach</option>
+              </select>
+            </div>
+
+            <canvas id="impactChart" height="160"
+              style="margin-top:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:8px;padding:8px"></canvas>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+              const compromisedEl = document.getElementById('compromised');
+              const exfilEl = document.getElementById('exfil');
+              const downtimeEl = document.getElementById('downtime');
+              const costEl = document.getElementById('cost');
+              const startBtn = document.getElementById('startSim');
+              const resetBtn = document.getElementById('resetSim');
+              const attackType = document.getElementById('attackType');
+
+              let chart;
+              function initChart() {
+                const ctx = document.getElementById('impactChart');
+                chart = new Chart(ctx, {
+                  type: 'line',
+                  data: {
+                    labels: [],
+                    datasets: [
+                      { label: 'Compromised systems', data: [], tension: 0.3 },
+                      { label: 'Data exfil (GB)', data: [], tension: 0.3 },
+                      { label: 'Downtime (hrs)', data: [], tension: 0.3 }
+                    ]
+                  },
+                  options: {
+                    plugins: { legend: { labels: { color: '#cfe8f2' } } }, scales: { x: { ticks: { color: '#9fb6c7' } }, y: { ticks: { color: '#9fb6c7' } } }
+                  }
+                });
+              }
+              initChart();
+
+              function prettyCost(n) { return '$' + n.toLocaleString(); }
+
+              function simulateOnce(type) {
+                // baseline multipliers per attack type (simple model)
+                const map = {
+                  ransomware: { c: 0.6, e: 1.2, d: 2.4, cost: 1.0 },
+                  supply: { c: 0.5, e: 2.0, d: 3.0, cost: 1.6 },
+                  insider: { c: 0.3, e: 0.5, d: 1.2, cost: 0.6 },
+                  phishing: { c: 0.4, e: 0.8, d: 1.6, cost: 0.9 }
+                };
+                const m = map[type] || map['ransomware'];
+
+                let steps = 10; // simulate 10 time steps
+                let compromised = 0, exfil = 0, downtime = 0, cost = 0;
+
+                chart.data.labels = [];
+                chart.data.datasets.forEach(ds => ds.data = []);
+
+                for (let t = 1; t <= steps; t++) {
+                  // growth dynamics (very simple model for demo)
+                  compromised += Math.round((Math.random() * 8 + 2) * m.c * t / 2);
+                  exfil += parseFloat(((Math.random() * 5 + 0.5) * m.e * t / 3).toFixed(2));
+                  downtime += parseFloat(((Math.random() * 0.5 + 0.1) * m.d * t / 4).toFixed(2));
+                  cost = Math.round((compromised * 1200 + exfil * 1500 + downtime * 800) * m.cost);
+
+                  chart.data.labels.push('t+' + t);
+                  chart.data.datasets[0].data.push(compromised);
+                  chart.data.datasets[1].data.push(parseFloat(exfil.toFixed(2)));
+                  chart.data.datasets[2].data.push(parseFloat(downtime.toFixed(2)));
+                }
+
+                chart.update();
+                compromisedEl.textContent = compromised;
+                exfilEl.textContent = exfil.toFixed(2);
+                downtimeEl.textContent = downtime.toFixed(2);
+                costEl.textContent = prettyCost(cost);
+              }
+
+              startBtn.addEventListener('click', () => {
+                startBtn.disabled = true;
+                startBtn.textContent = 'Running...';
+                setTimeout(() => { simulateOnce(attackType.value); startBtn.disabled = false; startBtn.textContent = 'Simulate attack' }, 900);
+              });
+              resetBtn.addEventListener('click', () => {
+                compromisedEl.textContent = '0'; exfilEl.textContent = '0'; downtimeEl.textContent = '0'; costEl.textContent = '$0';
+                chart.data.labels = []; chart.data.datasets.forEach(ds => ds.data = []); chart.update();
+              });
+            </script>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h2>Executive Summary</h2>
+            <p class="lead">For large enterprises such as IBM, a cyber attack can cause the following major impacts:</p>
+            <ul class="doc">
+              <li>Systems and servers compromised — leading to service outages.</li>
+              <li>Exfiltration of sensitive data (IP, customer data, trade secrets) — legal and financial consequences.
+              </li>
+              <li>Brand damage and regulatory scrutiny.</li>
+              <li>Costs for restoration, forensics, customer notification, and potential fines.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h2>Documentation: What to include in your incident report</h2>
+            <ol class="doc">
+              <li><strong>Incident summary</strong> — attack type, timeline, affected systems, initial access vector.
+              </li>
+              <li><strong>Impact analysis</strong> — data types exposed, downtime, customer impact, estimated cost.</li>
+              <li><strong>Root cause</strong> — vulnerability, misconfiguration, compromised credentials, third-party
+                supply chain.</li>
+              <li><strong>Mitigation actions taken</strong> — containment steps, eradication, patches, credential
+                rotations.</li>
+              <li><strong>Recovery plan</strong> — systems restored, validation, monitoring improvements.</li>
+              <li><strong>Post-incident recommendations</strong> — policy, technical controls, training, audits, and
+                governance actions.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- RIGHT: Checklist & Best Practices -->
+        <aside>
+          <div class="card">
+            <h3>Key Technical Controls</h3>
+            <ul class="checklist doc">
+              <li>Adopt a Zero Trust architecture — <span class="tag">Identity-first</span></li>
+              <li>Strong IAM: enforce MFA, least-privilege, and session monitoring — <span class="tag">MFA</span></li>
+              <li>Endpoint Detection & Response (EDR) and Extended Detection & Response (XDR) — <span
+                  class="tag">EDR/XDR</span></li>
+              <li>Network segmentation and micro-segmentation — <span class="tag">Segmentation</span></li>
+              <li>Regular patching and vulnerability management program — <span class="tag">Patch cadence</span></li>
+              <li>Secure CI/CD and supply-chain scanning (SBOM) — <span class="tag">SBOM</span></li>
+              <li>Encryption at rest and in transit, with strong key management — <span class="tag">KMS</span></li>
+              <li>Data Loss Prevention (DLP) and exfiltration detection — <span class="tag">DLP</span></li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h3>People & Process Controls</h3>
+            <ul class="doc">
+              <li>Maintain an Incident Response (IR) runbook and run tabletop exercises regularly (quarterly).</li>
+              <li>Operate a Security Operations Center (SOC) with 24/7 monitoring (in-house or MSSP).</li>
+              <li>Vendor risk management and security SLAs for third parties.</li>
+              <li>Regular security awareness training and phishing simulations for staff.</li>
+              <li>Legal and communications playbooks for breach disclosure and PR management.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h3>Governance & Compliance</h3>
+            <ul class="doc">
+              <li>Board-level cyber reporting and alignment with cyber insurance.</li>
+              <li>Continuous compliance monitoring for applicable regulations (e.g., SOX, GDPR, CCPA).</li>
+              <li>Regular red-team / purple-team adversary emulation exercises.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h3>Quick Checklist (for an IBM-scale enterprise)</h3>
+            <ol class="doc">
+              <li>Enable MFA on all privileged and administrative accounts.</li>
+              <li>Rotate and vault credentials; remove unused or stale access.</li>
+              <li>Deploy EDR and central logging (SIEM) with at least one year of retention.</li>
+              <li>Segment critical workloads (finance, IP repositories) into isolated zones.</li>
+              <li>Conduct monthly vulnerability scans and prioritize patching for critical CVEs.</li>
+              <li>Enforce least-privilege across developers, engineering, and third-party integrations.</li>
+              <li>Test backups and run IR exercises quarterly; validate recovery procedures.</li>
+            </ol>
+          </div>
+
+          <footer>
+            <div>This demo & documentation is a template. If you like, I can export it as a PDF or PowerPoint slide
+              deck.</div>
+          </footer>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Demo credentials (client-side). For real deployments, move auth server-side.
+    const DEMO_USERNAME = 'cybergirls916@gmail.com';
+    const DEMO_PASSWORD = 'cyber girls';
+
+    const loginScreen = document.getElementById('loginScreen');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    const mainApp = document.getElementById('mainApp');
+
+    if (localStorage.getItem('savedUsername')) {
+      usernameInput.value = localStorage.getItem('savedUsername');
+    }
+
+    loginBtn.addEventListener('click', () => {
+      const u = usernameInput.value || '';
+      const p = passwordInput.value || '';
+      if (verifyCredentials(u, p)) {
+        localStorage.setItem('authVerified', 'true');
+        localStorage.setItem('savedUsername', u); // remember username
+        showMain();
+      } else {
+        loginError.textContent = 'Invalid username or password. Please try again.';
+      }
+    });
+
+
+
+
+    /*---*/
+    function showMain() {
+      loginScreen.style.display = 'none';
+      loginScreen.setAttribute('aria-hidden', 'true');
+      mainApp.classList.remove('hidden');
+      // focus the first interactive element in main app
+      document.getElementById('startSim').focus();
+    }
+
+    function verifyCredentials(username, password) {
+      // normalize: trim and compare; username compared case-insensitive
+      if (!username || !password) return false;
+      const cleanUser = username.trim().toLowerCase();
+      const cleanPass = password; // preserve spaces in password
+      return (cleanUser === DEMO_USERNAME.toLowerCase() && cleanPass === DEMO_PASSWORD);
+    }
+
+    loginBtn.addEventListener('click', () => {
+      const u = usernameInput.value || '';
+      const p = passwordInput.value || '';
+      if (verifyCredentials(u, p)) {
+        sessionStorage.setItem('authVerified', 'true');
+        loginError.textContent = '';
+        showMain();
+      } else {
+        loginError.textContent = 'Invalid username or password. Please try again.';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    });
+
+    // allow Enter key to submit on password field
+    passwordInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+    usernameInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') passwordInput.focus();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      usernameInput.value = '';
+      passwordInput.value = '';
+      loginError.textContent = '';
+      usernameInput.focus();
+    });
+  </script>
+</body>
